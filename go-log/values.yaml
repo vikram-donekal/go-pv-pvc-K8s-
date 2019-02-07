@@ -1,0 +1,13 @@
+image:
+  repository: go-lang-log
+  pullPolicy: Never
+
+service:
+  type: NodePort
+  port: 9090
+
+go_pv:
+  path: /home/app_data/
+
+
+namespace: go-namespace

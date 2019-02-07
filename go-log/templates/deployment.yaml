@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "go-log.fullname" . }}
+  namespace: {{ default "eml" .Values.namespace  }}
+  labels:
+    app.kubernetes.io/name: {{ include "go-log.name" . }}
+    helm.sh/chart: {{ include "go-log.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "go-log.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "go-log.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+             - name: log-storage
+               mountPath: /go/src/app/test/
+          
+      volumes:
+      - name: log-storage
+        persistentVolumeClaim:
+          claimName: {{ include "go-log.fullname" . }}
